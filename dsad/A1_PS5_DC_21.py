@@ -4,6 +4,7 @@ import re
 import copy
 
 class PatientRecord:
+    """ Stores patient info. """
 
     def __init__(self, age, name, Pid):
         self.PatId = str(Pid) + str(age).rjust(2,'0')
@@ -13,13 +14,14 @@ class PatientRecord:
         self.right = None
 
     def __str__(self):
+        """ debugging aid """
         return "{}, {}, {}".format(self.name, self.age, self.PatId)
 
-# Build the Consult Queue as a max heap tree.
-#
-# For every new patient, the patient id is generated and
-# it's record inserted to heap tree and the tree is sorted.
 class ConsultQueue:
+    """ Build the Consult Queue as a max heap tree.
+        For every new patient, the patient id is generated and
+        it's record inserted to heap tree and the tree is heapified.
+    """
 
     initial_pid = pid = 1000  # patient counter (initial value ?)
     register = dict()   # dict to provide easy mapping b/w patId and patient node.
@@ -27,50 +29,38 @@ class ConsultQueue:
     queue2 = list()     # duplicate list, to preserve the original heap/queue for reconstruction.
     root = None         # heap tree's root
 
-    """
-        nothing to see here.
-    """
-    def __init__(self):
-        pass
 
-
-    """
-        registerPatient:
-            Register a patient node.
+    def registerPatient(self, name, age):
+        """ Register a patient node.
             - generates a patient ID
             - adds the patient node to a max heap tree.
-        
-        Returns:
-            Newly added patient node.
-    """
-    def registerPatient(self, name, age):
+
+            Return newly added patient node.
+        """
+
         patid = self._generate_pat_id(name, age)
         patient = PatientRecord(age, name, patid)
         self.register[patid] = patient
         return self.enqueuePatient(patid)
 
 
-    """
-        enqueuePatient:
-            Add patient node to max heap.
-
-        Returns:
-            Patient node.
-    """
     def enqueuePatient(self, PatId):
+        """ Add patient node to max heap.
+
+            Return patient node.
+        """
+
         patient = self.register[PatId]
         return self._heap_add(patient)
 
 
-    """
-        nextPatient:
-            Print next patient info.
+    def nextPatient(self):
+        """ Print next patient info,
             Remove next patient from the heap.
 
-        Returns:
-            Deleted patient node.
-    """
-    def nextPatient(self):
+            Return deleted patient node.
+        """
+
         if self.root is not None:
             self.write_out2(self.next_patient_banner(self.root))
             return self._dequeuePatient(self.root.PatId)  # dequeue root and sort the heap again.
@@ -78,22 +68,23 @@ class ConsultQueue:
             return None
 
 
-    """
-        _dequeuePatient:
-            Remove next patient from the heap.
-
-        Returns:
-            Deleted patient node.
-    """
     def _dequeuePatient(self, patid=None):
+        """ Remove next patient from the heap.
+            Argument: patId (unused, as we do not remove arbitrary patient node
+            but always the one from the heap's root.)
+            Argument kept only for compatibility with the question format.
+
+            Return deleted patient node.
+        """
+
         return self._heap_remove()  # always going to remove from the top.
 
 
-    """
-        new_patient_banner:
-            Return info about the new patient.
-    """
     def new_patient_banner(self, p):
+        """ Generate 'New Patient' message.
+            Return info about the new patient.
+        """
+
         return """---- new patient entered ---------------
 Patient details: {}, {}, {}
 Refreshed queue:
@@ -102,11 +93,12 @@ Refreshed queue:
 """.format(p.name, p.age, p.PatId, self._heap_items().rstrip())
 
 
-    """
-        next_patient_banner:
-            Return info about the next patient.
-    """
     def next_patient_banner(self, p):
+        """ Generate 'Next Patient' message.
+
+            Return info about the next patient.
+        """
+
         if p is None:
             return ""
 
@@ -116,33 +108,31 @@ Next patient for consultation is: {}, {}
 """.format(p.PatId, p.name)
 
 
-    """
-        _generate_pat_id:
-            Return Patient Id in <xxxx> form.
-    """
     def _generate_pat_id(self, age, name):
+        """ Generate patient id in <xxxx> form.
+
+            Return Patient Id.
+        """
+
         self.pid += 1
         # patId is like xxxx (eg. 0001)
         patid = str(self.pid).rjust(4, '0')
         return patid
 
 
-    """
-        _swap:
-            Swap two given nodes.
-    """
     def _swap(self, n1, n2):
+        """ Swap two nodes. """
+
         # It is easier to swap the values than all the links.
         n1.age, n2.age = n2.age, n1.age
         n1.name, n2.name = n2.name, n1.name
         n1.PatId, n2.PatId = n2.PatId, n1.PatId
 
-    """
-        _max:
-            Return the node having higher age value,
-            or None if both nodes do not exist.
-    """
     def _max(self, node1, node2):
+        """ Return the node having higher age value,
+            or None if both nodes do not exist.
+        """
+
         if node1 is None and node2 is None:
             return None
 
@@ -156,12 +146,9 @@ Next patient for consultation is: {}, {}
         else:
             return node2
 
-    """
-        _heap_add:
-            Add a node to max heap tree,
-            and sort/heapify the tree.
-    """
     def _heap_add(self, node):
+        """ Add a node to max heap tree and heapify the tree. """
+
         self.queue.append(node)
         # if heap is empty, add root node and return.
         if self.root is None:
@@ -180,12 +167,12 @@ Next patient for consultation is: {}, {}
         # starting from this node, sort upwards.
         return self._heapify_bottom_up(node)
 
-    """
-        _heap_remove:
-            Remove the root node from max heap tree,
-            and sort/heapify the tree.
-    """
     def _heap_remove(self):
+        """ Remove the root node from max heap tree and heapify the tree.
+
+            Return the deleted (root) node.
+        """
+
         # if there are no more elements to dequeue
         if len(self.queue) == 0:
             return None
@@ -206,11 +193,12 @@ Next patient for consultation is: {}, {}
 
         return root
 
-    """
-        _heapify_bottom_up:
-            Helper function to heapify the tree from bottom to top.
-    """
     def _heapify_bottom_up(self, node):
+        """ Helper function to heapify the tree from bottom to top.
+
+            Return the original node.
+        """
+
         parent = self.queue[len(self.queue) // 2 -1]
 
         while parent is not None and parent.age < node.age:
@@ -218,11 +206,9 @@ Next patient for consultation is: {}, {}
             node = parent      # move up and compare again
         return node
 
-    """
-        _heapify_top_down:
-            Helper function to heapify the tree from top to bottom.
-    """
     def _heapify_top_down(self):
+        """ Helper function to heapify the tree from top to bottom. """
+
         node = self.root
         while node is not None:
             child = self._max(node.left, node.right)
@@ -235,15 +221,15 @@ Next patient for consultation is: {}, {}
                 break
         return self.root
 
-    """
-        _heap_items
-            Deep copy the original list.
-            Print the max heap as sorted list by removing elements one by one.
-            Restore max heap from the copied list.
-        Returns
-            String output containing patient info sorted by age.
-    """
     def _heap_items(self):
+        """ List heap items in sorted order without changing the heap.
+            - Deep copy the original list.
+            - Print the max heap as sorted list by removing elements one by one.
+            - Restore max heap from the copied list.
+
+            Return string containing patients info sorted by age.
+        """
+
         # deep-copy the original list/heap for later restoration
         self.queue2 = copy.deepcopy(self.queue)
 
@@ -258,29 +244,10 @@ Next patient for consultation is: {}, {}
 
         return output
 
-    """
-        heap_items_via_queue_sort:
-            Make a copy of the original queue,
-            uses python's built-in list.sort() method
-            to sort the copy.
-            Return heap items in sorted manner.
 
-        This is not used,  _heap_items is called instead.
-    """
-    def _heap_items_via_queue_sort(self):
-        q = self.queue.copy()
-        q.sort(key=lambda a: a.age, reverse=True)
-        output = ""
-        for p in q:
-            output += "{}, {}\n".format(p.PatId, p.name)
-
-        return output
-
-    """
-        read_in1:
-            Read initial input file and register the patients.
-    """
     def read_in1(self):
+        """ Read initial input file and register the patients. """
+
         infile = 'inputPS5a.txt'
         with open(infile, "r") as f:
             for line in f:
@@ -291,11 +258,9 @@ Next patient for consultation is: {}, {}
                     self.registerPatient(name, age)
         return
 
-    """
-        write_out1:
-            Write the output generated after initial patients are registered.
-    """
     def write_out1(self):
+        """ Write the output generated after initial patients are registered. """
+
         outfile = 'outputPS5.txt'
         with open(outfile, "w") as f:
             text = """---- initial queue ---------------
@@ -307,22 +272,18 @@ Refreshed queue:
             f.write(text)
         return
 
-    """
-        read_in2:
-            Read the second input file, line by line
-    """
     def read_in2(self):
+        """ Read the second input file, line by line. """
+
         infile = 'inputPS5b.txt'
         with open(infile, "r") as f:
             for line in f:
                 yield line
         return
 
-    """
-        write_out2:
-            Write/append to second output file
-    """
     def write_out2(self, str):
+        """ Write/append to second output file. """
+
         outfile = 'outputPS5.txt'
         with open(outfile, "a+") as f:
             f.write(str)
