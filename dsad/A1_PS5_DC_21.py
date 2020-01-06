@@ -23,10 +23,10 @@ class ConsultQueue:
         it's record inserted to heap tree and the tree is heapified.
     """
 
-    initial_pid = pid = 1000  # patient counter (initial value ?)
-    register = dict()   # dict to provide easy mapping b/w patId and patient node.
+    initial_pid = pid = 1000  # patient counter (initial value.)
+    register = dict()   # provide easy mapping b/w patId and patient node.
     queue = list()      # stores the max heap tree
-    queue2 = list()     # duplicate list, to preserve the original heap/queue for reconstruction.
+    queue2 = list()     # duplicate list, preserves the original heap for reconstruction.
     root = None         # heap tree's root
 
 
@@ -55,17 +55,16 @@ class ConsultQueue:
 
 
     def nextPatient(self):
-        """ Print next patient info,
-            Remove next patient from the heap.
+        """ Remove next patient from the heap.
 
-            Return deleted patient node.
+            Return deleted patient node (or None).
         """
 
         if self.root is not None:
-            self.write_out2(self.next_patient_banner(self.root))
-            return self._dequeuePatient(self.root.PatId)  # dequeue root and sort the heap again.
+            # dequeue root and sort the heap again.
+            return self._dequeuePatient(self.root.PatId)
         else:
-            return None
+            return ""
 
 
     def _dequeuePatient(self, patid=None):
@@ -76,8 +75,7 @@ class ConsultQueue:
 
             Return deleted patient node.
         """
-
-        return self._heap_remove()  # always going to remove from the top.
+        return self._heap_remove()
 
 
     def new_patient_banner(self, p):
@@ -155,7 +153,7 @@ Next patient for consultation is: {}, {}
             self.root = node
             return node
 
-        # for every other node, find it's immediate parent.
+        # if heap is not-empty, find the (expected) parent of the new node.
         parent = self.queue[len(self.queue) // 2 -1]
 
         # connect the new node to parent's left/right, whichever available.
@@ -164,7 +162,7 @@ Next patient for consultation is: {}, {}
         else:
             parent.right = node
 
-        # starting from this node, sort upwards.
+        # starting from this node, heapify upwards.
         return self._heapify_bottom_up(node)
 
     def _heap_remove(self):
@@ -311,7 +309,8 @@ def main():
             patient = cq.registerPatient(name, age)
             cq.write_out2(cq.new_patient_banner(patient))
         elif re.match('^nextPatient', line):
-            cq.nextPatient()
+            patient = cq.nextPatient()
+            cq.write_out2(cq.next_patient_banner(patient))
 
 
 main()
