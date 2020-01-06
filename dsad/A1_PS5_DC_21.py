@@ -11,7 +11,6 @@ class PatientRecord:
         self.age = age
         self.left = None
         self.right = None
-        self.parent = None
 
     def __str__(self):
         return "{}, {}, {}".format(self.name, self.age, self.PatId)
@@ -170,14 +169,13 @@ Next patient for consultation is: {}, {}
             return node
 
         # for every other node, find it's immediate parent.
-        p = len(self.queue)//2 - 1
-        node.parent = self.queue[p]
+        parent = self.queue[len(self.queue) // 2 -1]
 
         # connect the new node to parent's left/right, whichever available.
-        if node.parent.left is None:
-            node.parent.left = node
+        if parent.left is None:
+            parent.left = node
         else:
-            node.parent.right = node
+            parent.right = node
 
         # starting from this node, sort upwards.
         return self._heapify_bottom_up(node)
@@ -192,39 +190,32 @@ Next patient for consultation is: {}, {}
         if len(self.queue) == 0:
             return None
 
-        # make last node the root, and then find it's right spot.
+        # swap root with last node, heapify, and then pop/return last node.
         last_node = self.queue[-1]
 
-        if last_node.parent is not None:    # non-root node.
+        if len(self.queue) > 1:
+            parent = self.queue[len(self.queue)//2 -1]
+            if parent.left is last_node:
+                parent.left = None
+            else:
+                parent.right = None
             self._swap(self.root, last_node)
 
-            # now remove last_node(previously root), by making its
-            # parent to last_node = None
-            if last_node.parent.left is last_node:
-                last_node.parent.left = None
-            else:
-                last_node.parent.right = None
+        root = self.queue.pop(-1)
+        self._heapify_top_down()
 
-            # last_node will be garbage collected once no one points to it,
-            # and it points to no one.
-            last_node.parent = None
-            self.queue.pop(-1)
-
-            self._heapify_top_down()
-        else:
-            self.root = None
-            self.queue.pop(0)   # remove root from queue
-
-        return last_node
+        return root
 
     """
         _heapify_bottom_up:
             Helper function to heapify the tree from bottom to top.
     """
     def _heapify_bottom_up(self, node):
-        while node.parent is not None and node.parent.age < node.age:
-            self._swap(node.parent, node)
-            node = node.parent      # move up and compare again
+        parent = self.queue[len(self.queue) // 2 -1]
+
+        while parent is not None and parent.age < node.age:
+            self._swap(parent, node)
+            node = parent      # move up and compare again
         return node
 
     """
