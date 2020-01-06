@@ -32,8 +32,8 @@ class ConsultQueue:
 
     def registerPatient(self, name, age):
         """ Register a patient node.
-            - generates a patient ID
-            - adds the patient node to a max heap tree.
+            - generate a patient ID
+            - add the patient node to a max heap tree.
 
             Return newly added patient node.
         """
@@ -171,21 +171,21 @@ Next patient for consultation is: {}, {}
             Return the deleted (root) node.
         """
 
-        # if there are no more elements to dequeue
+        # if there are no more elements to delete
         if len(self.queue) == 0:
             return None
 
-        # swap root with last node, heapify, and then pop/return last node.
+        # else, swap root with last node, heapify, and then pop/return last node.
+
+        # before swapping, remove parent->last_node pointer.
         last_node = self.queue[-1]
+        parent = self.queue[len(self.queue)//2 -1]
+        if parent.left is last_node:
+            parent.left = None
+        else:
+            parent.right = None
 
-        if len(self.queue) > 1:
-            parent = self.queue[len(self.queue)//2 -1]
-            if parent.left is last_node:
-                parent.left = None
-            else:
-                parent.right = None
-            self._swap(self.root, last_node)
-
+        self._swap(self.root, last_node)
         root = self.queue.pop(-1)
         self._heapify_top_down()
 
@@ -205,7 +205,10 @@ Next patient for consultation is: {}, {}
         return node
 
     def _heapify_top_down(self):
-        """ Helper function to heapify the tree from top to bottom. """
+        """ Helper function to heapify the tree from top to bottom.
+
+            Return the (new) root node.
+        """
 
         node = self.root
         while node is not None:
@@ -306,6 +309,7 @@ def main():
             (_, name_age) = re.split(r'newPatient: *', line.rstrip())
             (name, age) = re.split(r', *', name_age.rstrip())
             age = int(age)
+
             patient = cq.registerPatient(name, age)
             cq.write_out2(cq.new_patient_banner(patient))
         elif re.match('^nextPatient', line):
