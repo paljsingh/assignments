@@ -61,7 +61,7 @@ class ConsultQueue:
         """
 
         if self.root is not None:
-            # dequeue root and sort the heap again.
+            # dequeue root and heapify the tree again.
             return self._dequeuePatient(self.root.PatId)
         else:
             return ""
@@ -197,11 +197,19 @@ Next patient for consultation is: {}, {}
             Return the original node.
         """
 
-        parent = self.queue[len(self.queue) // 2 -1]
+        parent_pos = len(self.queue) // 2 -1
+        parent = self.queue[parent_pos]
 
         while parent is not None and parent.age < node.age:
             self._swap(parent, node)
             node = parent      # move up and compare again
+
+            # calculate current node's parent, special handling for root.
+            parent_pos = parent_pos // 2 - 1
+            if parent_pos < 0:
+                parent_pos = 0
+            parent = self.queue[parent_pos]
+
         return node
 
     def _heapify_top_down(self):
