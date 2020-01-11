@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import re
 import copy
+import re
+
 
 class PatientRecord:
     """ Stores patient info. """
 
     def __init__(self, age, name, Pid):
-        self.PatId = str(Pid) + str(age).rjust(2,'0')
+        self.PatId = str(Pid) + str(age).rjust(2, '0')
         self.name = name
         self.age = age
         self.left = None
@@ -17,6 +18,69 @@ class PatientRecord:
         """ debugging aid """
         return "{}, {}, {}".format(self.name, self.age, self.PatId)
 
+
+def next_patient_banner(p):
+    """ Generate 'Next Patient' message.
+
+        Return info about the next patient.
+    """
+
+    if p is None:
+        return ""
+
+    return """---- next patient ---------------
+Next patient for consultation is: {}, {}
+----------------------------------------------
+""".format(p.PatId, p.name)
+
+
+def _swap(n1, n2):
+    """ Swap two nodes. """
+
+    # It is easier to swap the values than all the links.
+    n1.age, n2.age = n2.age, n1.age
+    n1.name, n2.name = n2.name, n1.name
+    n1.PatId, n2.PatId = n2.PatId, n1.PatId
+
+
+def _max(node1, node2):
+    """ Return the node having higher age value,
+        or None if both nodes do not exist.
+    """
+
+    if node1 is None and node2 is None:
+        return None
+
+    if node1 is None:
+        return node2
+    if node2 is None:
+        return node1
+
+    if node1.age > node2.age:
+        return node1
+    else:
+        return node2
+
+
+def read_in2():
+    """ Read the second input file, line by line. """
+
+    infile = 'inputPS5b.txt'
+    with open(infile, "r") as f:
+        for line in f:
+            yield line
+    return
+
+
+def write_out2(file):
+    """ Write/append to second output file. """
+
+    outfile = 'outputPS5.txt'
+    with open(outfile, "a+") as f:
+        f.write(file)
+    return
+
+
 class ConsultQueue:
     """ Build the Consult Queue as a max heap tree.
         For every new patient, the patient id is generated and
@@ -24,11 +88,10 @@ class ConsultQueue:
     """
 
     initial_pid = pid = 1000  # patient counter (initial value.)
-    register = dict()   # provide easy mapping b/w patId and patient node.
-    queue = list()      # stores the max heap tree
-    queue2 = list()     # duplicate list, preserves the original heap for reconstruction.
-    root = None         # heap tree's root
-
+    register = dict()  # provide easy mapping b/w patId and patient node.
+    queue = list()  # stores the max heap tree
+    queue2 = list()  # duplicate list, preserves the original heap for reconstruction.
+    root = None  # heap tree's root
 
     def registerPatient(self, name, age):
         """ Register a patient node.
@@ -38,11 +101,10 @@ class ConsultQueue:
             Return newly added patient node.
         """
 
-        patid = self._generate_pat_id(name, age)
+        patid = self._generate_pat_id()
         patient = PatientRecord(age, name, patid)
         self.register[patid] = patient
         return self.enqueuePatient(patid)
-
 
     def enqueuePatient(self, PatId):
         """ Add patient node to max heap.
@@ -53,7 +115,6 @@ class ConsultQueue:
         patient = self.register[PatId]
         return self._heap_add(patient)
 
-
     def nextPatient(self):
         """ Remove next patient from the heap.
 
@@ -61,13 +122,12 @@ class ConsultQueue:
         """
 
         if self.root is not None:
-            # dequeue root and sort the heap again.
-            return self._dequeuePatient(self.root.PatId)
+            # dequeue root and heapify the tree again.
+            return self._dequeuePatient()
         else:
             return ""
 
-
-    def _dequeuePatient(self, patid=None):
+    def _dequeuePatient(self):
         """ Remove next patient from the heap.
             Argument: patId (unused, as we do not remove arbitrary patient node
             but always the one from the heap's root.)
@@ -76,7 +136,6 @@ class ConsultQueue:
             Return deleted patient node.
         """
         return self._heap_remove()
-
 
     def new_patient_banner(self, p):
         """ Generate 'New Patient' message.
@@ -90,23 +149,7 @@ Refreshed queue:
 ----------------------------------------------
 """.format(p.name, p.age, p.PatId, self._heap_items().rstrip())
 
-
-    def next_patient_banner(self, p):
-        """ Generate 'Next Patient' message.
-
-            Return info about the next patient.
-        """
-
-        if p is None:
-            return ""
-
-        return """---- next patient ---------------
-Next patient for consultation is: {}, {}
-----------------------------------------------
-""".format(p.PatId, p.name)
-
-
-    def _generate_pat_id(self, age, name):
+    def _generate_pat_id(self):
         """ Generate patient id in <xxxx> form.
 
             Return Patient Id.
@@ -116,33 +159,6 @@ Next patient for consultation is: {}, {}
         # patId is like xxxx (eg. 0001)
         patid = str(self.pid).rjust(4, '0')
         return patid
-
-
-    def _swap(self, n1, n2):
-        """ Swap two nodes. """
-
-        # It is easier to swap the values than all the links.
-        n1.age, n2.age = n2.age, n1.age
-        n1.name, n2.name = n2.name, n1.name
-        n1.PatId, n2.PatId = n2.PatId, n1.PatId
-
-    def _max(self, node1, node2):
-        """ Return the node having higher age value,
-            or None if both nodes do not exist.
-        """
-
-        if node1 is None and node2 is None:
-            return None
-
-        if node1 is None:
-            return node2
-        if node2 is None:
-            return node1
-
-        if node1.age > node2.age:
-            return node1
-        else:
-            return node2
 
     def _heap_add(self, node):
         """ Add a node to max heap tree and heapify the tree. """
@@ -154,7 +170,7 @@ Next patient for consultation is: {}, {}
             return node
 
         # if heap is not-empty, find the (expected) parent of the new node.
-        parent = self.queue[len(self.queue) // 2 -1]
+        parent = self.queue[len(self.queue) // 2 - 1]
 
         # connect the new node to parent's left/right, whichever available.
         if parent.left is None:
@@ -179,13 +195,13 @@ Next patient for consultation is: {}, {}
 
         # before swapping, remove parent->last_node pointer.
         last_node = self.queue[-1]
-        parent = self.queue[len(self.queue)//2 -1]
+        parent = self.queue[len(self.queue) // 2 - 1]
         if parent.left is last_node:
             parent.left = None
         else:
             parent.right = None
 
-        self._swap(self.root, last_node)
+        _swap(self.root, last_node)
         root = self.queue.pop(-1)
         self._heapify_top_down()
 
@@ -197,11 +213,19 @@ Next patient for consultation is: {}, {}
             Return the original node.
         """
 
-        parent = self.queue[len(self.queue) // 2 -1]
+        parent_pos = len(self.queue) // 2 - 1
+        parent = self.queue[parent_pos]
 
         while parent is not None and parent.age < node.age:
-            self._swap(parent, node)
-            node = parent      # move up and compare again
+            _swap(parent, node)
+            node = parent  # move up and compare again
+
+            # calculate current node's parent, special handling for root.
+            parent_pos = parent_pos // 2 - 1
+            if parent_pos < 0:
+                parent_pos = 0
+            parent = self.queue[parent_pos]
+
         return node
 
     def _heapify_top_down(self):
@@ -212,11 +236,11 @@ Next patient for consultation is: {}, {}
 
         node = self.root
         while node is not None:
-            child = self._max(node.left, node.right)
+            child = _max(node.left, node.right)
             # if current node's age value is smaller than one of it's child,
             # swap with larger child.
             if child is not None and node.age < child.age:
-                self._swap(node, child)
+                _swap(node, child)
                 node = child
             else:
                 break
@@ -245,7 +269,6 @@ Next patient for consultation is: {}, {}
 
         return output
 
-
     def read_in1(self):
         """ Read initial input file and register the patients. """
 
@@ -273,26 +296,8 @@ Refreshed queue:
             f.write(text)
         return
 
-    def read_in2(self):
-        """ Read the second input file, line by line. """
-
-        infile = 'inputPS5b.txt'
-        with open(infile, "r") as f:
-            for line in f:
-                yield line
-        return
-
-    def write_out2(self, str):
-        """ Write/append to second output file. """
-
-        outfile = 'outputPS5.txt'
-        with open(outfile, "a+") as f:
-            f.write(str)
-        return
-
 
 def main():
-
     # create the initial queue from infile1
     cq = ConsultQueue()
     cq.read_in1()
@@ -301,7 +306,7 @@ def main():
     cq.write_out1()
 
     # enqueue new patients from infile2.
-    for line in cq.read_in2():
+    for line in read_in2():
         # we expect either a 'New patient' with name/age info
         # or the 'Next Patient' command
         if re.match('^newPatient:', line):
@@ -311,10 +316,10 @@ def main():
             age = int(age)
 
             patient = cq.registerPatient(name, age)
-            cq.write_out2(cq.new_patient_banner(patient))
+            write_out2(cq.new_patient_banner(patient))
         elif re.match('^nextPatient', line):
             patient = cq.nextPatient()
-            cq.write_out2(cq.next_patient_banner(patient))
+            write_out2(next_patient_banner(patient))
 
 
 main()
