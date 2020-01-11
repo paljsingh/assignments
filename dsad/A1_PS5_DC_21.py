@@ -26,7 +26,7 @@ def next_patient_banner(p):
     """
 
     if p is None:
-        return ""
+        return "ERROR: Patient queue is empty.\n"
 
     return """---- next patient ---------------
 Next patient for consultation is: {}, {}
