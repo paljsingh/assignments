@@ -1,0 +1,223 @@
+Analysis of Assignment 5
+========================
+
+
+Program logic
+-=-=-=-=-=-=-
+
+    Populating Initial ConsultQueue
+    --------------------------------
+
+    The programs implements a priority queue via a max-heap tree, which is
+    built one node at a time with the given initial list of patients. The
+    tree is heapified using the bottom-up approach, each time a patient node
+    is inserted.
+
+    The max-heap is implemented with a python list, which makes it easier to
+    reach to any node's parent using its index. The list also allows for
+    arbitrarily large number of nodes to be inserted, the upper bound on the
+    number of nodes is limited only by system's available memory.
+
+
+    Refreshing the Queue
+    --------------------
+
+    Once the heap tree is populated with the given list of initial list of
+    patients, the queue is refreshed, which means the heap tree is printed
+    in non-decreasing order of patient's age. Printing a heap tree requires
+    that the elements of the tree are removed one by one, with max-heap
+    being heapified after every deletion. The deletion uses the strategy of
+    swapping the last node with heap tree's root (patient node with highest
+    age), and then heapifying the tree again using top-down heapify
+    approach. The original root node is removed from the tree (python list)
+    and the process is repeated till the queue is empty.
+
+    Since the printing of sorted ConsultQueue requires emptying out of the
+    original queue, we need to keep a copy of the ConsultQueue for later
+    restoration of the heap-tree, so that the tree can be refreshed /
+    printed again, once a new patient is registered.
+
+
+    Patient Registration
+    --------------------
+
+    Every time a new patient is added to the ConsultQueue, the heap-tree is
+    heapified using the bottom-up heapify approach.
+
+
+    Next Patient
+    ------------
+
+    A nextPatient command deletes the patient node from the root of the heap
+    tree using top-down heapify approach.
+
+
+
+Time complexity
+-=-=-=-=-=-=-=-
+
+    Building initial ConsultQueue
+    -----------------------------
+
+    Initially, if the number of patients having arrived at clinic is 'm' the
+    time complexity to build the initial ConsultQueue is:
+
+    O(m * log m)
+
+    Once the ConsultQueue is built, it needs to be refreshed / printed,
+    which incurs an additional
+
+    O(m * log m) complexity.
+
+
+    Subsequent New Patients
+    -----------------------
+
+    If there are 'n' newPatient commands (means, 'n' new patient arrive
+    subsequently (while none of the original 'm' patients are removed from
+    the priority queue, the total size of the max-heap grows to n + m.  The
+    time complexity of insertion for 'n' new nodes is:
+
+    O(n * log (m+n))
+
+
+    ConsultQueue refresh
+    --------------------
+
+    However, as the ConsultQueue needs to be refreshed and restored after
+    each new patiend node is inserted, the complexity for refreshing
+    ConsultQueue *once* is:
+
+    Time complexity of sorting (m+n) elements + Time complexity of backing
+    up original queue + Time complexity of restoring the queue.
+
+    = O((m+n) * log(m+n))     +     O(m+n)    +    O(1) = O((m+n) *
+    log(m+n))
+
+    For 'n' newPatient commands, the complexity becomes: O(n* (m+n) *
+    log(m+n))
+
+
+    Next Patient
+    ------------
+
+    A patient node is deleted, and tree is heapified.
+
+    The heapification is done in: O (log (m+n)) time (assuming the total
+    queue size is (m+n).
+
+    If there are 'p' nextPatient commanads, the complexity of deleting 'p'
+    nodes and heapifying the tree becomes:
+
+    O(p * log(m+n))
+
+    NextPatient command does not require the queue to be printed, so no
+    additional complexity is incurred.
+
+
+    ---------------------
+    Total Time Complexity
+    ---------------------
+
+    The total time complexity can be obtained by summing up all the
+    individual time complexities above:
+
+    2*O(m * log m) + O(n * (m+n) * log(m+n)) + O(p * log(m+n))
+
+    with m, n and p being arbitrarily large numbers approaching N, the
+    upper-bound for the total time complexity can be given by:
+
+    O(N^2 * log(N))
+    ---------------
+
+
+Space complexity
+-=-=-=-=-=-=-=-=
+
+    The program uses the following structures to store / implement the max
+    heap tree as a priority queue.
+
+    queue - A python list structure that stores the max-heap tree.
+
+	    Space complexity incurred by 'queue' strcuture is:
+
+	    O(m+n)
+        here, 'm' being the count of initial patients, and 'n'
+	    patients are added subsequently.
+
+
+    queue2 - Another python list structure to back up the 'queue' contents
+        before refreshing, and restore the original heap tree subsequently.
+
+        Space complexity incurred by 'queue2' strcuture is also:
+
+	    O(m+n)
+
+
+    register - A python dict structure to map the patient id to patient
+        nodes. This one is *not* required if we choose to pass patient info
+        using PatientRecord node, instead of patient id. However, as the
+        skeleton program of problem expects to pass patient-id to
+        _enqueuePatient instead of PatientRecord, we need a mapping
+        structure to get the correct PatientRecord node.
+
+	    Space complexity incurred by 'register' strcuture is also:
+
+	    O(m+n)
+
+
+    ----------------------
+    Total space Complexity
+    ----------------------
+
+    The total space complexity can be obtained by summing up all the
+    individual space complexities above:
+
+    3 * O(m + n) = O(m + n)
+
+    which can be considered as 
+    
+    O(N)
+    N being the total number of the patients.
+
+
+Further Optimization and Takeaways
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+    - A max heap tree is not a suitable structure where one needs to print
+    the sorted list frequently. As the full sorted list can only be obtained
+    after removing all elements one by one, this incurs O(n*logn)
+    complexity for every print operation. 
+    A structure such as a binary search tree is a better fit in such cases,
+    which can provide a sorted list in O(n) time, thus reducing the total
+    time complexity for 'm' sorted-print operations to
+    O(mn) instead of the current O(mn logn).
+
+    - max heap can be built in O(n) time complexity when all the initial n
+    nodes are given. This approach uses only non-lead nodes for
+    heapification, starting from the lowest level of the initial level-order
+    tree. 
+    The current implementation builds the tree one element at a time,
+    and incurs O(n logn) for heap building. 
+    This can be improved.
+
+    - An ideal solution to the given problem would be by making use of an
+    *additional* binary search tree for printing the sorted list. This comes
+    at the cost of an additional O(n) space complexity.
+
+    In this case -
+
+	    * Each new node would be added to both the heap tree and BST with
+	    O(logn) time complexity.
+
+        * A deletion would cause the node to be deleted from both heap and
+        BST with O(logn) time complexity.
+    
+        * Printing a list would print the sorted list by traversing BST only,
+    	with O(n) time complexity, thus 'm' print operations would require O(mn)
+    	complexity.
+
+        * Additionally, we would not require a backup queue to preserve original
+        heap tree, as the sorted print happens only through BST; thereby
+        cancelling out the added space complexity of maintaining a BST.
+
