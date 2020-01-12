@@ -22,9 +22,9 @@ Program logic
     Refreshing the Queue
     --------------------
 
-    Once the heap tree is populated with the given list of initial list of
-    patients, the queue is refreshed, which means the heap tree is printed
-    in non-decreasing order of patient's age. Printing a heap tree requires
+    Once the heap tree is populated with the given list of initial patients,
+    the queue is refreshed, which means the heap tree is printed in
+    non-decreasing order of patient's age. Printing a heap tree requires
     that the elements of the tree are removed one by one, with max-heap
     being heapified after every deletion. The deletion uses the strategy of
     swapping the last node with heap tree's root (patient node with highest
