@@ -73,8 +73,8 @@ Time complexity
     Subsequent New Patients
     -----------------------
 
-    If there are 'n' newPatient commands (means, 'n' new patient arrive
-    subsequently (while none of the original 'm' patients are removed from
+    If there are 'n' newPatient commands ('n' new patient arrive
+    subsequently) while none of the original 'm' patients are removed from
     the priority queue, the total size of the max-heap grows to n + m.  The
     time complexity of insertion for 'n' new nodes is:
 
@@ -207,8 +207,8 @@ Further Optimization and Takeaways
 
     In this case -
 
-	    * Each new node would be added to both the heap tree and BST with
-	    O(logn) time complexity.
+        * Each new node would be added to both the heap tree and BST with
+        O(logn) time complexity.
 
         * A deletion would cause the node to be deleted from both heap and
         BST with O(logn) time complexity.
