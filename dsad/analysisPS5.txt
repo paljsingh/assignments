@@ -28,9 +28,9 @@ Program logic
     that the elements of the tree are removed one by one, with max-heap
     being heapified after every deletion. The deletion uses the strategy of
     swapping the last node with heap tree's root (patient node with highest
-    age), and then heapifying the tree again using top-down heapify
-    approach. The original root node is removed from the tree (python list)
-    and the process is repeated till the queue is empty.
+    age), and then heapifying the tree using top-down heapify approach.
+    The original root node is removed from the tree (python list) and the
+    process is repeated till the queue is empty.
 
     Since the printing of sorted ConsultQueue requires emptying out of the
     original queue, we need to keep a copy of the ConsultQueue for later
@@ -64,8 +64,8 @@ Time complexity
 
     O(m * log m)
 
-    Once the ConsultQueue is built, it needs to be refreshed / printed,
-    which incurs an additional
+    Upon building the initial ConsultQueue, it needs to be refreshed / printed
+    *one time*, incurring an additional:
 
     O(m * log m) complexity.
 
@@ -85,7 +85,7 @@ Time complexity
     --------------------
 
     However, as the ConsultQueue needs to be refreshed and restored after
-    each new patiend node is inserted, the complexity for refreshing
+    each new patient node is inserted, the complexity for refreshing
     ConsultQueue *once* is:
 
     Time complexity of sorting (m+n) elements + Time complexity of backing
@@ -106,12 +106,12 @@ Time complexity
     The heapification is done in: O (log (m+n)) time, assuming the total
     queue size is (m+n).
 
-    If there are 'p' nextPatient commanads, the complexity of deleting 'p'
+    If there are 'p' nextPatient commands, the complexity of deleting 'p'
     nodes and heapifying the tree becomes:
 
     O(p * log(m+n))
 
-    NextPatient command does not require the queue to be printed, so no
+    nextPatient command does not require the queue to be printed, so no
     additional complexity is incurred.
 
 
@@ -139,7 +139,7 @@ Space complexity
 
     queue - A python list structure that stores the max-heap tree.
 
-	    Space complexity incurred by 'queue' strcuture is:
+	    Space complexity incurred by 'queue' structure is:
 
 	    O(m+n)
         here, 'm' being the count of initial patients, and 'n'
@@ -149,7 +149,7 @@ Space complexity
     queue2 - Another python list structure to back up the 'queue' contents
         before refreshing, and restore the original heap tree subsequently.
 
-        Space complexity incurred by 'queue2' strcuture is also:
+        Space complexity incurred by 'queue2' structure is also:
 
 	    O(m+n)
 
@@ -161,7 +161,7 @@ Space complexity
         _enqueuePatient instead of PatientRecord, we need a mapping
         structure to get the correct PatientRecord node.
 
-	    Space complexity incurred by 'register' strcuture is also:
+	    Space complexity incurred by 'register' structure is also:
 
 	    O(m+n)
 
@@ -219,5 +219,5 @@ Further Optimization and Takeaways
 
         * Additionally, we would not require a backup queue to preserve original
         heap tree, as the sorted print happens only through BST; thereby
-        cancelling out the added space complexity of maintaining a BST.
+        canceling out the added space complexity of maintaining a BST.
 
