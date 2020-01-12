@@ -103,7 +103,7 @@ Time complexity
 
     A patient node is deleted, and tree is heapified.
 
-    The heapification is done in: O (log (m+n)) time (assuming the total
+    The heapification is done in: O (log (m+n)) time, assuming the total
     queue size is (m+n).
 
     If there are 'p' nextPatient commanads, the complexity of deleting 'p'
@@ -194,7 +194,7 @@ Further Optimization and Takeaways
     O(mn) instead of the current O(mn logn).
 
     - max heap can be built in O(n) time complexity when all the initial n
-    nodes are given. This approach uses only non-lead nodes for
+    nodes are given. This approach uses only non-leaf nodes for
     heapification, starting from the lowest level of the initial level-order
     tree. 
     The current implementation builds the tree one element at a time,
