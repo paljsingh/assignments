@@ -226,7 +226,7 @@ Refreshed queue:
             node = parent  # move up and compare again
 
             # calculate current node's parent's index, special handling for root.
-            parent_pos = parent_pos // 2 - 1
+            parent_pos = (parent_pos-1) // 2
             if parent_pos < 0:
                 parent_pos = 0
             parent = self.queue[parent_pos]
