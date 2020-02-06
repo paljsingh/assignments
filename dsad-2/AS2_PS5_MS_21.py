@@ -4,6 +4,16 @@ import re
 
 
 def _max_subarray_lr(lst, low, mid, high):
+    """ find the subarray with maximum sum.
+
+    :param lst: list of items containing profits.
+    :param low: current low index
+    :param mid: current high index
+    :param high: current mid index
+    :return: sum of left+right, left and right subarray index.
+    """
+
+    # sum of left subarray.
     left_total = 0
     max_left = max_right = 0
     current_total = 0
@@ -13,6 +23,7 @@ def _max_subarray_lr(lst, low, mid, high):
             left_total = current_total
             max_left = i
 
+    # sum of right subarray.
     right_total = 0
     current_total = 0
     for i in range(mid+1, high+1, 1):
@@ -21,18 +32,31 @@ def _max_subarray_lr(lst, low, mid, high):
             right_total = current_total
             max_right = i
 
-    return left_total+right_total, max_left, max_right
+    return left_total + right_total, max_left, max_right
 
 
 def maxProfit_divide_conquer(lst, low, high):
+    """ Find the maximum profit in a profits array using divide and conquer method.
+
+    :param lst: list of items containing profits.
+    :param low: current low index
+    :param high: current high index
+    :return: maximum profit, profit start index, profit end index
+    """
+
     if low == high:
         return lst[low].get('profit'), low, high
     else:
         mid = (low + high) // 2
+
+        # recursively divide profits array into left/right halves, and return
+        # max(left, right, left_right) profit value.
         left_total, left_low, left_high = maxProfit_divide_conquer(lst, low, mid)
         right_total, right_low, right_high = maxProfit_divide_conquer(lst, mid+1, high)
         lr_total, lr_low, lr_high = _max_subarray_lr(lst, low, mid, high)
 
+        # return max(left_total, right_total, left_right_total) along with
+        # it's respective start/end position in the profits array.
         if left_total >= right_total and left_total >= lr_total:
             return left_total, left_low, left_high
         elif right_total >= left_total and right_total >= lr_total:
@@ -42,6 +66,12 @@ def maxProfit_divide_conquer(lst, low, high):
 
 
 def maxProfit_iterative(lst):
+    """ find maximum profit along with buy/sell day in a stock price list,
+    using iterative method.
+
+    :param lst: list of items containing day/stock-price values.
+    :return: maximum profit, buy day, sell day
+    """
     profit = 0
     buy_day = min_day = 0
     sell_day = 1
@@ -57,15 +87,30 @@ def maxProfit_iterative(lst):
     return profit, buy_day, sell_day
 
 
-
 def main():
+    """ read input file, compute max-profit using iterative and divide/conquer methods
+    and write the profit, buy-day, sell-day to output file.
+
+    :return:
+    """
 
     infile = 'inputPS5.txt'
     lst = list()
 
+    # read input file and create a list like the following:
+    # (
+    #    { 'day': 0, 'price': 10, 'profit': 0 },
+    #    { 'day': 1, 'price': 20, 'profit': 10 },
+    #    { 'day': 2, 'price': 15, 'profit':  -5},
+    #    { 'day': 3, 'price': 30, 'profit':  15},
+    #    ...
+    # )
     with open(infile, "r") as f:
         for line in f:
-            if re.match('[0-9]+ */ *[0-9]+', line):
+            # process only lines containing the pattern:
+            # <number>[optional spaces]/[optional spaces]<number>
+            if re.match('^[0-9]+ */ *[0-9]+$', line):
+                # split by '/' with 0 or more spaces on either sides.
                 (day, price) = re.split(r' */ *', line.rstrip())
                 day = int(day)
                 price = int(price)
@@ -74,7 +119,6 @@ def main():
     for i in range(1, len(lst)):
         lst[i]['profit'] = lst[i].get('price') - lst[i-1].get('price')
 
-
     outfile = 'outputPS5.txt'
     with open(outfile, 'w+') as f:
 
@@ -82,7 +126,6 @@ def main():
         if len(lst) < 2:
             f.write("ERROR: Too few entries.\n")
             return
-
 
         # find maximum subarray for divide and conquer approach.
         # buy_day will be 1 day before the first profit day.
