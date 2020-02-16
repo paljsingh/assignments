@@ -1,1 +1,6 @@
-ERROR: Too few entries.
+Maximum Profit(Divide & Conquer): 43
+Day to buy: 7
+Day to sell: 11
+Maximum Profit(Iterative Solution): 43
+Day to buy: 7
+Day to sell: 11
